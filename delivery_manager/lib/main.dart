@@ -5,7 +5,24 @@ void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  ThemeMode themeMode = ThemeMode.light;
+
+  void toggleThemeMode() {
+    setState(() {
+      if (themeMode == ThemeMode.dark) {
+        themeMode = ThemeMode.light;
+      } else {
+        themeMode = ThemeMode.dark;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -14,7 +31,12 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.blue[900],
         accentColor: Colors.white,
       ),
-      home: HomeScreen(),
+      darkTheme: ThemeData(
+        primaryColor: Colors.grey[900],
+        accentColor: Colors.grey[600],
+      ),
+      themeMode: themeMode,
+      home: HomeScreen(toggleThemeMode),
     );
   }
 }
