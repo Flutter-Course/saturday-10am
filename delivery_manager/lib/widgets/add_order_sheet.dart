@@ -1,5 +1,6 @@
 import 'package:delivery_manager/models/order.dart';
 import 'package:delivery_manager/widgets/bottom_sheet_title.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -200,23 +201,44 @@ class _AddOrderSheetState extends State<AddOrderSheet> {
                             );
                             widget.addOrder(key, order);
                           } catch (error) {
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  title: Text('Invalid price'),
-                                  content: Text('Please enter valid price.'),
-                                  actions: [
-                                    FlatButton(
-                                      child: Text('Ok'),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
+                            if (Theme.of(context).platform ==
+                                TargetPlatform.iOS) {
+                              showCupertinoDialog(
+                                context: context,
+                                builder: (context) {
+                                  return CupertinoAlertDialog(
+                                    title: Text('Invalid price'),
+                                    content: Text('Please enter valid price.'),
+                                    actions: [
+                                      FlatButton(
+                                        child: Text('Ok'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            } else {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: Text('Invalid price'),
+                                    content: Text('Please enter valid price.'),
+                                    actions: [
+                                      FlatButton(
+                                        child: Text('Ok'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            }
                           }
                         },
                       ),

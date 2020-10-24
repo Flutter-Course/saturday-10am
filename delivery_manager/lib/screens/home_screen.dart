@@ -196,7 +196,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
             Spacer(),
-            Switch(
+            Switch.adaptive(
               value: dark,
               onChanged: (value) {
                 setState(() {
