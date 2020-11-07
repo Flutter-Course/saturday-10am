@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:roovies/helpers/dummy_data.dart';
+import 'package:roovies/providers/persons_provider.dart';
 
 class PersonsList extends StatelessWidget {
   @override
@@ -10,7 +12,7 @@ class PersonsList extends StatelessWidget {
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemExtent: 140,
-        itemCount: 5,
+        itemCount: Provider.of<PersonsProvider>(context).trendingPersons.length,
         itemBuilder: (context, index) {
           return Padding(
             padding: EdgeInsets.symmetric(horizontal: 5),
@@ -20,8 +22,10 @@ class PersonsList extends StatelessWidget {
                   flex: 8,
                   child: CircleAvatar(
                     radius: 60,
-                    backgroundImage:
-                        NetworkImage(DummyData.nowPlaying[index]['poster_url']),
+                    backgroundImage: NetworkImage(
+                        Provider.of<PersonsProvider>(context)
+                            .trendingPersons[index]
+                            .posterUrl),
                   ),
                 ),
                 Expanded(
@@ -29,7 +33,9 @@ class PersonsList extends StatelessWidget {
                   child: Center(
                     child: FittedBox(
                       child: Text(
-                        DummyData.nowPlaying[index]['movie_name'],
+                        Provider.of<PersonsProvider>(context)
+                            .trendingPersons[index]
+                            .name,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(

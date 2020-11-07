@@ -16,7 +16,7 @@ class TrendingMovies extends StatelessWidget {
           SizedBox(
             height: 10,
           ),
-          MoviesList(),
+          MoviesList.byTrending(),
         ],
       ),
     );
