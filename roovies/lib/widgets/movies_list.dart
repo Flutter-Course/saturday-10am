@@ -36,10 +36,12 @@ class _MoviesListState extends State<MoviesList> {
         done = await Provider.of<MoviesProvider>(context, listen: false)
             .fetchTrendingMovies();
       }
-      setState(() {
-        firstRun = false;
-        successful = done;
-      });
+      if (mounted) {
+        setState(() {
+          firstRun = false;
+          successful = done;
+        });
+      }
     }
   }
 
@@ -69,65 +71,102 @@ class _MoviesListState extends State<MoviesList> {
                             .moviesByGenre[index]
                         : Provider.of<MoviesProvider>(context)
                             .trendingMovies[index];
+
+                    bool isFav = Provider.of<MoviesProvider>(context)
+                        .isFavorite(movie.id);
                     return Padding(
                       padding: EdgeInsets.symmetric(horizontal: 5),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).pushNamed(
-                              MovieDetailsScreen.routeName,
-                              arguments: movie);
-                        },
-                        child: Column(
-                          children: [
-                            Expanded(
-                              flex: 7,
-                              child: Image.network(
-                                movie.posterUrl,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: Center(
-                                child: Text(
-                                  movie.title,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    color: Colors.white,
+                      child: Stack(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).pushNamed(
+                                  MovieDetailsScreen.routeName,
+                                  arguments: movie);
+                            },
+                            child: Column(
+                              children: [
+                                Expanded(
+                                  flex: 7,
+                                  child: Image.network(
+                                    movie.posterUrl,
+                                    fit: BoxFit.cover,
                                   ),
+                                ),
+                                Expanded(
+                                  flex: 2,
+                                  child: Center(
+                                    child: Text(
+                                      movie.title,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        '${movie.rating}',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      RatingBar(
+                                        allowHalfRating: true,
+                                        ignoreGestures: true,
+                                        itemCount: 5,
+                                        initialRating: movie.rating / 2,
+                                        itemPadding: EdgeInsets.all(2),
+                                        itemSize: 10,
+                                        itemBuilder: (context, _) => Icon(
+                                          Icons.star,
+                                          color: Colors.amber,
+                                        ),
+                                        onRatingUpdate: null,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Positioned(
+                            right: 5,
+                            top: 5,
+                            child: Container(
+                              padding: EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                gradient: RadialGradient(
+                                  colors: [
+                                    Theme.of(context).primaryColor,
+                                    Theme.of(context)
+                                        .primaryColor
+                                        .withOpacity(0),
+                                  ],
+                                ),
+                              ),
+                              child: InkWell(
+                                onTap: () {
+                                  Provider.of<MoviesProvider>(context,
+                                          listen: false)
+                                      .toggleFavoriteStatus(movie);
+                                },
+                                child: Icon(
+                                  (isFav)
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
+                                  color: Theme.of(context).accentColor,
                                 ),
                               ),
                             ),
-                            Expanded(
-                              flex: 1,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    '${movie.rating}',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  RatingBar(
-                                    allowHalfRating: true,
-                                    ignoreGestures: true,
-                                    itemCount: 5,
-                                    initialRating: movie.rating / 2,
-                                    itemPadding: EdgeInsets.all(2),
-                                    itemSize: 10,
-                                    itemBuilder: (context, _) => Icon(
-                                      Icons.star,
-                                      color: Colors.amber,
-                                    ),
-                                    onRatingUpdate: null,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     );
                   },

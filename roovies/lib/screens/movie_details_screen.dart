@@ -3,6 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:roovies/models/movie.dart';
 import 'package:roovies/models/movie_details.dart';
 import 'package:roovies/providers/movies_provider.dart';
+import 'package:roovies/screens/video_screen.dart';
+import 'package:roovies/widgets/movie_genres.dart';
+import 'package:roovies/widgets/movie_info.dart';
+import 'package:roovies/widgets/movie_overview.dart';
 import 'package:roovies/widgets/movie_rating_bar.dart';
 import 'package:sliver_fab/sliver_fab.dart';
 
@@ -16,11 +20,13 @@ class MovieDetailsScreen extends StatefulWidget {
 class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   MovieDetails movieDetails;
   Movie movie;
-  bool firstRun;
+  bool firstRun, successful;
+  String videoKey;
   @override
   void initState() {
     super.initState();
     firstRun = true;
+    successful = false;
   }
 
   @override
@@ -28,12 +34,25 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
     super.didChangeDependencies();
     if (firstRun) {
       movie = ModalRoute.of(context).settings.arguments as Movie;
-      movieDetails = await Provider.of<MoviesProvider>(context, listen: false)
-          .fetchMovieDetails(movie.id);
-      // print(movieDetails.overview);
-      setState(() {
-        firstRun = false;
-      });
+
+      List results = await Future.wait([
+        Provider.of<MoviesProvider>(context, listen: false)
+            .fetchMovieDetails(movie.id),
+        Provider.of<MoviesProvider>(context, listen: false)
+            .fetchVideoByMovieId(movie.id)
+      ]);
+      if (mounted) {
+        setState(() {
+          if (results.any((element) => element == null)) {
+            successful = false;
+          } else {
+            successful = true;
+            movieDetails = results[0];
+            videoKey = results[1];
+          }
+          firstRun = false;
+        });
+      }
     }
   }
 
@@ -44,7 +63,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
           ? Center(
               child: CircularProgressIndicator(),
             )
-          : (movieDetails != null)
+          : (successful)
               ? SliverFab(
                   slivers: [
                     SliverAppBar(
@@ -89,11 +108,18 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                       ),
                     ),
                     SliverPadding(
-                      padding: EdgeInsets.all(8.0),
+                      padding: EdgeInsets.all(16.0),
                       sliver: SliverList(
                         delegate: SliverChildListDelegate(
                           [
                             MovieRatingBar(movie.rating),
+                            MovieOverview(movieDetails.overview),
+                            MovieInfo(
+                              movieDetails.budget.toString(),
+                              movieDetails.duration.toString(),
+                              movieDetails.releaseDate,
+                            ),
+                            MovieGenres(movieDetails.genres),
                           ],
                         ),
                       ),
@@ -102,7 +128,13 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                   floatingPosition: FloatingPosition(right: 20),
                   expandedHeight: MediaQuery.of(context).size.height * 0.4,
                   floatingWidget: FloatingActionButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) {
+                          return VideoScreen(videoKey);
+                        },
+                      ));
+                    },
                     child: Icon(Icons.play_arrow),
                   ),
                 )

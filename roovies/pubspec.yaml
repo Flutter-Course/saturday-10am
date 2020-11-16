@@ -29,6 +29,10 @@ dependencies:
   dio: ^3.0.10
   provider: ^4.3.2+2
   sliver_fab: ^1.0.0
+  youtube_player_flutter: ^6.1.1
+  email_validator: ^1.0.6
+  shared_preferences: ^0.5.12+4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -60,6 +64,10 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
+    - family: Pacifico
+      fonts:
+        - asset: assets/fonts/Pacifico-Regular.ttf
+          weight: 400
     - family: Poppins
       fonts:
         - asset: assets/fonts/Poppins-Thin.ttf

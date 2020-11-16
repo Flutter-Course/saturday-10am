@@ -78,4 +78,11 @@ class TMDBHandler {
     Response response = await _dio.get(url, queryParameters: parms);
     return MovieDetails.fromJson(response.data);
   }
+
+  Future<String> getVideoByMoviId(int movieId) async {
+    String url = '$mainUrl/movie/$movieId/videos';
+    final parms = {'api_key': ApiKeys.tmdbKey};
+    Response response = await _dio.get(url, queryParameters: parms);
+    return response.data['results'][0]['key'];
+  }
 }

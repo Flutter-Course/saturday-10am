@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:roovies/models/firebase_handler.dart';
 import 'package:roovies/models/movie.dart';
 import 'package:roovies/models/movie_details.dart';
 import 'package:roovies/models/tmdb_handler.dart';
@@ -7,6 +8,7 @@ class MoviesProvider with ChangeNotifier {
   List<Movie> nowPlayingMovies;
   List<Movie> moviesByGenre;
   List<Movie> trendingMovies;
+  List<Movie> favorites = [];
   Future<bool> fetchNowPlayingMovies() async {
     try {
       nowPlayingMovies = await TMDBHandler.instance.getNowPlaying();
@@ -42,5 +44,29 @@ class MoviesProvider with ChangeNotifier {
     } catch (error) {
       return null;
     }
+  }
+
+  Future<String> fetchVideoByMovieId(int movieId) async {
+    try {
+      return await TMDBHandler.instance.getVideoByMoviId(movieId);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  void toggleFavoriteStatus(Movie movie) async {
+    if (isFavorite(movie.id)) {
+      await FireBaseHandler.instance.deleteFavorite(movie);
+      favorites.removeWhere((element) => element.id == movie.id);
+    } else {
+      await FireBaseHandler.instance.addFavorite(movie);
+      favorites.add(movie);
+    }
+
+    notifyListeners();
+  }
+
+  bool isFavorite(int movieId) {
+    return favorites.any((element) => element.id == movieId);
   }
 }

@@ -6,6 +6,8 @@ import 'package:roovies/models/tmdb_handler.dart';
 import 'package:roovies/providers/genres_provider.dart';
 import 'package:roovies/providers/movies_provider.dart';
 import 'package:roovies/providers/persons_provider.dart';
+import 'package:roovies/providers/user_provider.dart';
+import 'package:roovies/screens/authentication_screen.dart';
 import 'package:roovies/widgets/genres_list.dart';
 import 'package:roovies/widgets/now_playing.dart';
 import 'package:roovies/widgets/trending_movies.dart';
@@ -47,6 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print(Provider.of<UserProvider>(context).currentUser.email);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -58,7 +61,12 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.search),
-            onPressed: () {},
+            onPressed: () {
+              Provider.of<UserProvider>(context, listen: false)
+                  .cleareUserData();
+              Navigator.of(context)
+                  .pushReplacementNamed(AuthenticationScreen.routeName);
+            },
           ),
         ],
       ),
