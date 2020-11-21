@@ -54,7 +54,6 @@ class MyApp extends StatelessWidget {
           } else if (snapshot.data == true) {
             return HomeScreen();
           } else {
-            print(snapshot.error);
             return AuthenticationScreen();
           }
         },

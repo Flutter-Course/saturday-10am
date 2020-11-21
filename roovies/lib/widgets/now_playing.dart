@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:page_indicator/page_indicator.dart';
 import 'package:provider/provider.dart';
-import 'package:roovies/helpers/dummy_data.dart';
 import 'package:roovies/providers/movies_provider.dart';
 
 class NowPlaying extends StatelessWidget {

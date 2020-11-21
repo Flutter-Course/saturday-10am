@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:roovies/helpers/dummy_data.dart';
 import 'package:roovies/providers/persons_provider.dart';
 
 class PersonsList extends StatelessWidget {

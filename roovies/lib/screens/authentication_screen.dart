@@ -1,7 +1,6 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:roovies/models/firebase_handler.dart';
 import 'package:roovies/providers/user_provider.dart';
 import 'package:roovies/screens/home_screen.dart';
 

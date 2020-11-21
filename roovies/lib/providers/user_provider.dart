@@ -57,10 +57,23 @@ class UserProvider with ChangeNotifier {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     if (preferences.containsKey('idToken')) {
       currentUser = User.fromPrefs(preferences);
-      print('here');
       return true;
     } else {
       return false;
+    }
+  }
+
+  Future<bool> refreshTokenIfNecessary() async {
+    if (DateTime.now().isAfter(currentUser.expiryDate)) {
+      try {
+        currentUser = await FireBaseHandler.instance.refreshToken(currentUser);
+        await saverUserData();
+        return true;
+      } catch (error) {
+        return false;
+      }
+    } else {
+      return true;
     }
   }
 }

@@ -12,9 +12,10 @@ class FireBaseHandler {
   String mainUrl = 'https://roovies-sat-1.firebaseio.com';
   Dio _dio = Dio();
 
-  Future<void> addFavorite(Movie movie) async {
-    String url = '$mainUrl/users/userId/favorites/${movie.id}.json';
-    await _dio.put(url, data: {
+  Future<void> addFavorite(Movie movie, User user) async {
+    String url = '$mainUrl/users/${user.userId}/favorites/${movie.id}.json';
+    final params = {'auth': user.idToken};
+    await _dio.put(url, queryParameters: params, data: {
       'id': movie.id,
       'vote_average': movie.rating,
       'title': movie.title,
@@ -23,9 +24,12 @@ class FireBaseHandler {
     });
   }
 
-  Future<void> deleteFavorite(Movie movie) async {
-    String url = '$mainUrl/users/userId/favorites/${movie.id}.json';
-    await _dio.delete(url);
+  Future<void> deleteFavorite(Movie movie, User user) async {
+    String url = '$mainUrl/users/${user.userId}/favorites/${movie.id}.json';
+    final params = {
+      'auth': user.idToken,
+    };
+    await _dio.delete(url, queryParameters: params);
   }
 
   Future<User> signUp(String email, String password) async {
@@ -63,5 +67,50 @@ class FireBaseHandler {
       },
     );
     return User.fromJson(response.data);
+  }
+
+  Future<User> refreshToken(User user) async {
+    String url = 'https://securetoken.googleapis.com/v1/token';
+    final params = {
+      'key': ApiKeys.firebaseKey,
+    };
+    Response response = await _dio.post(
+      url,
+      queryParameters: params,
+      data: {
+        'grant_type': 'refresh_token',
+        'refresh_token': user.refreshToken,
+      },
+    );
+
+    user.idToken = response.data['id_token'];
+    user.refreshToken = response.data['refresh_token'];
+    user.expiryDate = DateTime.now().add(
+      Duration(
+        seconds: int.parse(
+          response.data['expires_in'],
+        ),
+      ),
+    );
+    return user;
+  }
+
+  Future<List<Movie>> favorites(User user) async {
+    String url = '$mainUrl/users/${user.userId}/favorites.json';
+    final params = {
+      'auth': user.idToken,
+    };
+    Response response = await _dio.get(
+      url,
+      queryParameters: params,
+    );
+    if (response.data != null) {
+      List<Movie> favs = (response.data as Map).entries.map((e) {
+        return Movie.fromJson(e.value);
+      }).toList();
+      return favs;
+    } else {
+      return [];
+    }
   }
 }
