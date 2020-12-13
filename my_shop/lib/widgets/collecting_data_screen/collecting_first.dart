@@ -10,14 +10,15 @@ import 'package:my_shop/widgets/misc/right_arrow_button.dart';
 import '../../screens/auth_screen.dart';
 
 class CollectingFirst extends StatefulWidget {
-  final Function logout;
-  CollectingFirst(this.logout);
+  final Function logout, nextPage;
+  CollectingFirst(this.logout, this.nextPage);
   @override
   _CollectingFirstState createState() => _CollectingFirstState();
 }
 
 class _CollectingFirstState extends State<CollectingFirst> {
   File image;
+  String userName, mobileNumber;
   FocusNode mobileNode;
   @override
   void initState() {
@@ -35,6 +36,17 @@ class _CollectingFirstState extends State<CollectingFirst> {
         image = File(pickedImage.path);
       });
     }
+  }
+
+  bool validateData() {
+    bool valid = true;
+    if (image == null) valid = false;
+    if (userName == null || userName.length < 3) valid = false;
+    if (mobileNumber == null ||
+        mobileNumber.length != 11 ||
+        !mobileNumber.startsWith('01')) valid = false;
+
+    return valid;
   }
 
   @override
@@ -104,6 +116,11 @@ class _CollectingFirstState extends State<CollectingFirst> {
                     mobileNode.requestFocus();
                   },
                   textInputAction: TextInputAction.next,
+                  onChanged: (value) {
+                    setState(() {
+                      userName = value;
+                    });
+                  },
                   decoration: InputDecoration(
                     enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(
@@ -129,6 +146,11 @@ class _CollectingFirstState extends State<CollectingFirst> {
                 TextField(
                   focusNode: mobileNode,
                   keyboardType: TextInputType.phone,
+                  onChanged: (value) {
+                    setState(() {
+                      mobileNumber = value;
+                    });
+                  },
                   decoration: InputDecoration(
                     enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(
@@ -167,7 +189,29 @@ class _CollectingFirstState extends State<CollectingFirst> {
             ),
             RightArrowButton(
               child: 'Next',
-              onPressed: () {},
+              onPressed: () {
+                if (validateData()) {
+                  widget.nextPage(image, userName, mobileNumber);
+                } else {
+                  showDialog(
+                    context: context,
+                    child: AlertDialog(
+                      title: Text('Invalid or Missing Data'),
+                      content: Text(
+                        'Please check that you have picked an image, and the username contains 3 characters at least and you entered valid mobile number.',
+                      ),
+                      actions: [
+                        FlatButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text('Ok'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              },
             )
           ],
         )),

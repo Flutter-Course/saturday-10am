@@ -1,6 +1,8 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:my_shop/providers/user_provider.dart';
 
 import 'auth_title.dart';
 
@@ -36,20 +38,16 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
         loading = true;
       });
 
-      try {
-        print(email);
-        await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      String error = await Provider.of<UserProvider>(context, listen: false)
+          .resetPassword(email);
+      if (error == null) {
         Scaffold.of(context).showSnackBar(SnackBar(
           content: Text('Email has been sent.'),
           backgroundColor: Colors.green[900],
         ));
-      } on FirebaseAuthException catch (e) {
+      } else {
         showError('Error has occurred');
-        print(e.code);
       }
-      setState(() {
-        loading = false;
-      });
     }
   }
 
