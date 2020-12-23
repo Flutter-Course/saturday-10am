@@ -5,10 +5,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:my_shop/models/customer.dart';
 import 'package:my_shop/models/user.dart' as myApp;
+import 'package:my_shop/models/vendor.dart';
 
 class UserProvider with ChangeNotifier {
-  var currentUser;
+  myApp.User currentUser;
   Future<String> login(String email, String password) async {
     try {
       await FirebaseAuth.instance
@@ -66,6 +68,7 @@ class UserProvider with ChangeNotifier {
       String photoUrl = await ref.getDownloadURL();
       await FirebaseFirestore.instance.collection('users').doc(userId).set(
         {
+          'type': 'customer',
           'email': email,
           'userName': userName,
           'photoUrl': photoUrl,
@@ -91,13 +94,50 @@ class UserProvider with ChangeNotifier {
           .get();
       if (document.exists) {
         //load data
-        currentUser = myApp.User.formFireStore(userId, email, document);
+        if (document['type'] == 'customer') {
+          currentUser = Customer.fromFirestore(userId, email, document);
+        } else {
+          currentUser = Vendor.formFireStore(userId, email, document);
+        }
+        await currentUser.init();
         return true;
       } else {
         return false;
       }
     } catch (e) {
+      print(e);
       return false;
     }
   }
+
+  Future<bool> switchUserType() async {
+    try {
+      if (isCustomer) {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser.userId)
+            .update({
+          'type': 'vendor',
+        });
+        currentUser = Vendor.fromCustomer(currentUser);
+      } else {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser.userId)
+            .update({
+          'type': 'customer',
+        });
+        currentUser = Customer.fromVendor(currentUser);
+      }
+
+      currentUser.init();
+
+      notifyListeners();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  bool get isCustomer => currentUser is Customer;
 }

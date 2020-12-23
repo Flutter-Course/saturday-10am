@@ -5,6 +5,8 @@ import 'package:my_shop/screens/auth_screen.dart';
 import 'package:my_shop/screens/collecting_data_screen.dart';
 import 'package:my_shop/screens/home_screen.dart';
 import 'package:my_shop/screens/splash_screen.dart';
+import 'package:my_shop/screens/vendor_screens/add_product_screen.dart';
+import 'package:my_shop/screens/vendor_screens/products_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:my_shop/providers/user_provider.dart';
 import 'package:my_shop/screens/transit_screen.dart';
@@ -25,6 +27,9 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primaryColor: Colors.white,
           accentColor: Colors.black,
+          appBarTheme: AppBarTheme(
+            centerTitle: true,
+          ),
           fontFamily: 'MontserratAlternates',
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
@@ -46,6 +51,8 @@ class MyApp extends StatelessWidget {
           HomeScreen.routeName: (context) => HomeScreen(),
           CollectingDataScreen.routeName: (context) => CollectingDataScreen(),
           TransitScreen.routeName: (context) => TransitScreen(),
+          ProductsScreen.routeName: (context) => ProductsScreen(),
+          AddProductScreen.routeName: (context) => AddProductScreen(),
         },
       ),
     );
