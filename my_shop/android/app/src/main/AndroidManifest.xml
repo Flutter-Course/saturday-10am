@@ -10,7 +10,7 @@
         android:label="my_shop"
         android:icon="@mipmap/ic_launcher">
         <meta-data android:name="com.google.android.geo.API_KEY"
-              android:value="AIzaSyA5muiETPN6QQ_eL4RiDpCzzkNI4iY4rAE"/>
+            android:value="AIzaSyB_nisNq7qXP89mcnmvrKwTUk_MTiOMkD4"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
@@ -46,5 +46,4 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
-    <uses-permission android:name="android.permission.INTERNET"/>
 </manifest>

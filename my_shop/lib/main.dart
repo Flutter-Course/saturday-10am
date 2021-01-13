@@ -1,15 +1,19 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:my_shop/providers/cart.dart';
+import 'package:my_shop/providers/product_options.dart';
+import 'package:my_shop/providers/products_provider.dart';
+import 'package:my_shop/providers/user_provider.dart';
+import 'package:my_shop/screens/add_product_screen.dart';
 import 'package:my_shop/screens/auth_screen.dart';
-import 'package:my_shop/screens/collecting_data_screen.dart';
+import 'package:my_shop/screens/cart_screen.dart';
+import 'package:my_shop/screens/checkout_screen.dart';
+import 'package:my_shop/screens/filter_screen.dart';
 import 'package:my_shop/screens/home_screen.dart';
 import 'package:my_shop/screens/splash_screen.dart';
-import 'package:my_shop/screens/vendor_screens/add_product_screen.dart';
-import 'package:my_shop/screens/vendor_screens/products_screen.dart';
-import 'package:provider/provider.dart';
-import 'package:my_shop/providers/user_provider.dart';
 import 'package:my_shop/screens/transit_screen.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,20 +22,27 @@ void main() {
 
 class MyApp extends StatelessWidget {
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => UserProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => UserProvider()),
+        ChangeNotifierProvider(create: (context) => ProductOptionsProvider()),
+        ChangeNotifierProvider(create: (context) => ProductsProvider()),
+        ChangeNotifierProvider(create: (context) => Cart()),
+      ],
       child: MaterialApp(
         title: 'MyShop',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primaryColor: Colors.white,
           accentColor: Colors.black,
+          fontFamily: 'MontserratAlternates',
+          visualDensity: VisualDensity.adaptivePlatformDensity,
           appBarTheme: AppBarTheme(
             centerTitle: true,
           ),
-          fontFamily: 'MontserratAlternates',
-          visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
         home: FutureBuilder(
             future: _initialization,
@@ -41,18 +52,18 @@ class MyApp extends StatelessWidget {
               } else {
                 if (FirebaseAuth.instance.currentUser != null) {
                   return TransitScreen();
-                } else {
-                  return AuthScreen();
                 }
+                return AuthScreen();
               }
             }),
         routes: {
           AuthScreen.routeName: (context) => AuthScreen(),
           HomeScreen.routeName: (context) => HomeScreen(),
-          CollectingDataScreen.routeName: (context) => CollectingDataScreen(),
           TransitScreen.routeName: (context) => TransitScreen(),
-          ProductsScreen.routeName: (context) => ProductsScreen(),
           AddProductScreen.routeName: (context) => AddProductScreen(),
+          FilterScreen.routeName: (context) => FilterScreen(),
+          CartScreen.routeName: (context) => CartScreen(),
+          CheckoutScreen.routeName: (context) => CheckoutScreen(),
         },
       ),
     );

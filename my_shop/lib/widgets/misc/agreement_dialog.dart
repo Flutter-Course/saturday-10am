@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:my_shop/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -8,12 +10,12 @@ class AgreementDialog extends StatefulWidget {
 }
 
 class _AgreementDialogState extends State<AgreementDialog> {
-  bool agreement, flutter;
+  bool agree, confirm;
   ScrollController controller;
   @override
   void initState() {
     super.initState();
-    agreement = flutter = false;
+    agree = confirm = false;
     controller = ScrollController();
   }
 
@@ -26,91 +28,86 @@ class _AgreementDialogState extends State<AgreementDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Switch Account'),
+      title: Text('Switch Type'),
       content: Column(
         children: [
           Expanded(
-            child: Scrollbar(
-              isAlwaysShown: true,
-              controller: controller,
-              child: SingleChildScrollView(
-                controller: controller,
-                padding: EdgeInsets.only(right: 10),
-                child: Text(
-                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean hendrerit gravida nunc, in semper nibh interdum sed. Ut ultrices tempus dictum. Nunc et metus egestas, efficitur erat nec, dignissim justo. Nulla a velit sit amet augue aliquet feugiat. Aliquam erat volutpat. In hac habitasse platea dictumst. Vestibulum dapibus tortor sit amet mi tristique iaculis nec id urna. Vestibulum mattis lorem ipsum, eget iaculis libero accumsan a. Maecenas et sapien nulla. Praesent venenatis feugiat sem eget ultrices. In in sapien varius, volutpat ex mollis, tristique dui. Quisque accumsan eros nulla. Cras ullamcorper ligula urna, in laoreet lectus imperdiet sit amet. Curabitur feugiat, est sed commodo commodo, sem diam vehicula erat, et mollis justo metus eleifend dolor. Nulla ac ornare augue, non molestie justo.\nAenean imperdiet tincidunt dui a imperdiet. Phasellus et tempus sem. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer id purus sit amet nunc consequat semper. Nunc finibus justo ante, ac facilisis eros dictum quis. Suspendisse malesuada finibus libero, eget semper velit. Quisque commodo ligula sed tortor facilisis aliquam. Donec pharetra vestibulum varius. Cras vel luctus lectus. Nullam dictum neque sit amet efficitur sagittis. Nunc feugiat, felis vel sollicitudin pretium, ex est varius diam, vitae tristique dui dolor at massa. Pellentesque eget dui eleifend, rhoncus neque eu, vehicula dui. Maecenas nec nisi eu sem aliquet venenatis. Nunc ante lorem, iaculis ut enim in, sodales varius odio. Fusce ante dolor, dictum a arcu a, posuere tincidunt nunc.\nNam consectetur lectus nec augue mattis varius. Proin eu eleifend sapien, a facilisis augue. Praesent placerat consequat magna, eget rhoncus purus auctor et. Donec eu dolor euismod, semper orci ac, euismod orci. Morbi dictum lectus varius neque iaculis laoreet. Morbi volutpat orci a velit elementum, tristique interdum enim tempor. Integer et urna neque. Pellentesque sit amet tristique quam. Aliquam leo purus, consectetur vel quam consectetur, maximus hendrerit ante. Vivamus faucibus ullamcorper felis quis aliquam. Nulla facilisi. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus felis magna, convallis ac augue auctor, ornare pellentesque metus. Ut sollicitudin mauris eu cursus faucibus.',
+            child: Card(
+              elevation: 10,
+              margin: EdgeInsets.zero,
+              child: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Scrollbar(
+                  controller: controller,
+                  isAlwaysShown: true,
+                  child: SingleChildScrollView(
+                    controller: controller,
+                    padding: EdgeInsets.only(right: 15),
+                    child: Text(
+                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum dolor id diam imperdiet, sed varius massa pulvinar. Fusce volutpat sapien nec purus lacinia elementum. Praesent et urna a est mattis convallis ac suscipit augue. In mollis at sapien sit amet sollicitudin. Donec ornare orci in facilisis luctus. Donec molestie bibendum orci, vitae gravida nisl sollicitudin at. Fusce laoreet aliquet nulla, a aliquet urna finibus eu. Vivamus quis volutpat sapien, id pretium massa. Fusce luctus, tortor tempus aliquet semper, nibh lectus dapibus dui, mollis vehicula ipsum turpis nec arcu. Nulla facilisi. Curabitur maximus, ex at sodales condimentum, turpis leo blandit dolor, sit amet dapibus lorem enim quis orci.\n\nMaecenas euismod ipsum eget lacus pulvinar, non rutrum lacus consectetur. Nunc rutrum sollicitudin dui, nec tristique ex ullamcorper sed. Duis et consectetur ligula. Quisque sodales orci tincidunt, tempus quam sit amet, accumsan odio. Vestibulum ut dui et purus facilisis accumsan sit amet at enim. Quisque condimentum, nunc at tincidunt egestas, arcu lectus dignissim lectus, at commodo eros lacus eget mi. Nam scelerisque lacus eu varius vulputate. Etiam efficitur velit eleifend, feugiat tortor eget, tristique enim. Nulla at tempus lorem. Etiam eros neque, sollicitudin accumsan tincidunt et, porta sed metus. Aliquam commodo sollicitudin mi. Etiam elit sem, laoreet a massa nec, tempor vestibulum enim. Etiam eu iaculis lacus. In sed nibh nisi.\n\nMaecenas congue malesuada congue. Curabitur ut ultrices arcu, sit amet efficitur neque. Cras varius nulla quis lectus luctus, mollis accumsan lectus pharetra. Nunc aliquam lacus nec orci feugiat maximus. Aliquam egestas dictum risus, vitae dapibus eros. Integer faucibus velit eu lorem pharetra, nec pretium ipsum interdum. Donec facilisis est et diam dictum blandit. Suspendisse vitae nisl quis nunc tristique laoreet ac in sapien. Integer ullamcorper purus in orci finibus, eu pellentesque odio bibendum. Cras quis arcu nec eros congue facilisis eget ut justo. Morbi sit amet dapibus est, at molestie arcu.'),
+                  ),
                 ),
               ),
             ),
           ),
-          ListTile(
-            leading: Checkbox(
-              value: agreement,
-              onChanged: (value) {
-                setState(() {
-                  agreement = !agreement;
-                });
-              },
-            ),
-            title: Text('I accept the agreement.'),
-            onTap: () {
-              setState(() {
-                agreement = !agreement;
-              });
-            },
+          SizedBox(
+            height: 10,
           ),
           ListTile(
-            leading: Checkbox(
-              value: flutter,
-              onChanged: (value) {
-                setState(() {
-                  flutter = !flutter;
-                });
-              },
-            ),
-            title: Text('I love flutter.'),
+            contentPadding: EdgeInsets.zero,
             onTap: () {
               setState(() {
-                flutter = !flutter;
+                agree = !agree;
               });
             },
+            leading: Checkbox(
+                value: agree,
+                onChanged: (value) {
+                  setState(() {
+                    agree = !agree;
+                  });
+                }),
+            title: Text('I agree.'),
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            onTap: () {
+              setState(() {
+                confirm = !confirm;
+              });
+            },
+            leading: Checkbox(
+                value: confirm,
+                onChanged: (value) {
+                  setState(() {
+                    confirm = !confirm;
+                  });
+                }),
+            title: Text('I confirm.'),
           ),
         ],
       ),
       actions: [
         RaisedButton(
           color: Colors.black,
-          onPressed: (agreement && flutter)
-              ? () async {
-                  bool noError =
-                      await Provider.of<UserProvider>(context, listen: false)
-                          .switchUserType();
-                  if (noError) {
-                    Navigator.of(context).pop();
-                  } else {
-                    showDialog(
-                      context: context,
-                      child: AlertDialog(
-                        title: Text('Error has occurred'),
-                        content: Text('Try again later.'),
-                        actions: [
-                          FlatButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text('Ok'),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                }
-              : null,
           child: Text(
-            'Switch',
+            'Switch Account',
             style: TextStyle(
               color: Colors.white,
             ),
           ),
+          onPressed: (agree && confirm)
+              ? () async {
+                  bool noError =
+                      await Provider.of<UserProvider>(context, listen: false)
+                          .toggleUserType();
+                  if (noError) {
+                    Navigator.of(context).pop();
+                  } else {
+                    //showDialog
+                  }
+                }
+              : null,
         ),
       ],
     );

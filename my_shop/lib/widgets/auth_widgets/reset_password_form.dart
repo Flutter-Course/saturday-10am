@@ -1,14 +1,12 @@
 import 'package:email_validator/email_validator.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:my_shop/providers/user_provider.dart';
-
-import 'auth_title.dart';
+import 'package:my_shop/widgets/auth_widgets/auth_title.dart';
+import 'package:provider/provider.dart';
 
 class ResetPasswordForm extends StatefulWidget {
-  final Function resetPassword;
-  ResetPasswordForm(this.resetPassword);
+  final Function toggleResetPassword;
+  ResetPasswordForm(this.toggleResetPassword);
   @override
   _ResetPasswordFormState createState() => _ResetPasswordFormState();
 }
@@ -17,27 +15,18 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
   GlobalKey<FormState> form;
   String email;
   bool loading;
-
   @override
   void initState() {
     super.initState();
-    form = GlobalKey<FormState>();
     loading = false;
+    form = GlobalKey<FormState>();
   }
 
-  void showError(String error) {
-    Scaffold.of(context).showSnackBar(SnackBar(
-      content: Text(error),
-      backgroundColor: Colors.redAccent,
-    ));
-  }
-
-  void validateToResetPassword() async {
+  void tryToResetPassword() async {
     if (form.currentState.validate()) {
       setState(() {
         loading = true;
       });
-
       String error = await Provider.of<UserProvider>(context, listen: false)
           .resetPassword(email);
       if (error == null) {
@@ -46,105 +35,117 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
           backgroundColor: Colors.green[900],
         ));
       } else {
-        showError('Error has occurred');
+        Scaffold.of(context).showSnackBar(SnackBar(
+          content: Text(error),
+          backgroundColor: Colors.red[900],
+        ));
       }
+
+      setState(() {
+        loading = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height,
       width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
       child: Center(
         child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 30).add(
-            EdgeInsets.only(
-              top: MediaQuery.of(context).size.height * 0.05,
-            ),
-          ),
+          padding: EdgeInsets.fromLTRB(30, 30, 30, 5),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               AuthTitle(UniqueKey(), 'Reset password of'),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.05,
+              ),
               Form(
                 key: form,
-                child: TextFormField(
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                  validator: (value) {
-                    setState(() {
-                      email = value;
-                    });
-
-                    if (EmailValidator.validate(email)) {
-                      return null;
-                    }
-
-                    return 'Please enter your email';
-                  },
-                  decoration: InputDecoration(
-                    hintText: 'example@abc.com',
-                    labelText: 'Email',
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Colors.white,
-                        width: 3,
+                child: Column(
+                  children: [
+                    TextFormField(
+                      validator: (value) {
+                        setState(() {
+                          email = value;
+                        });
+                        if (EmailValidator.validate(value)) {
+                          return null;
+                        }
+                        return 'Email validator';
+                      },
+                      style: TextStyle(color: Colors.white),
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        errorBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.redAccent,
+                          ),
+                        ),
+                        errorStyle: TextStyle(color: Colors.redAccent),
+                        hintText: 'example@abc.com',
+                        labelText: 'Email',
+                        labelStyle: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        hintStyle: TextStyle(
+                          color: Colors.white,
+                        ),
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white, width: 1),
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.white,
+                            width: 2,
+                          ),
+                        ),
                       ),
                     ),
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Colors.white,
-                      ),
-                    ),
-                    labelStyle: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                    hintStyle: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
+                  ],
                 ),
               ),
-              Container(
-                width: double.infinity,
-                height: 50,
-                margin: EdgeInsets.only(top: 20),
-                child: (loading)
-                    ? Center(
-                        child: CircularProgressIndicator(),
-                      )
-                    : RaisedButton(
+              SizedBox(
+                height: 30,
+              ),
+              (loading)
+                  ? Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : Container(
+                      width: double.infinity,
+                      height: 50,
+                      child: RaisedButton(
                         shape: StadiumBorder(),
-                        color: Theme.of(context).accentColor,
+                        color: Colors.black,
                         child: Text(
                           'Reset Password',
                           key: UniqueKey(),
                           style: TextStyle(
-                            fontWeight: FontWeight.bold,
                             fontSize: 20,
-                            color: Theme.of(context).primaryColor,
+                            color: Colors.white,
                           ),
                         ),
                         onPressed: () {
-                          validateToResetPassword();
+                          tryToResetPassword();
                         },
                       ),
-              ),
+                    ),
               Align(
                 alignment: Alignment.center,
                 child: FlatButton(
+                  padding: EdgeInsets.zero,
                   child: Text(
                     'Cancel',
                     style: TextStyle(
                       color: Colors.white,
-                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   onPressed: () {
-                    widget.resetPassword();
+                    widget.toggleResetPassword();
                   },
                 ),
               ),

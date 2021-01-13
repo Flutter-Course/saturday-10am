@@ -12,7 +12,6 @@ class _SwitchButtonState extends State<SwitchButton>
     with TickerProviderStateMixin {
   AnimationController controller;
   Animation<double> animation;
-
   @override
   void initState() {
     super.initState();
@@ -27,30 +26,52 @@ class _SwitchButtonState extends State<SwitchButton>
   }
 
   @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     bool isCustomer = Provider.of<UserProvider>(context).isCustomer;
     return InkWell(
       onTap: () {
         showDialog(context: context, child: AgreementDialog());
       },
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-        decoration: BoxDecoration(
+      child: Card(
+        margin: EdgeInsets.only(top: 15),
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
-          gradient: LinearGradient(
+        ),
+        elevation: 12,
+        shadowColor: Colors.amber,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            gradient: LinearGradient(
               colors: [
                 Colors.amber,
                 Colors.white,
                 Colors.amber,
               ],
+              stops: [
+                0,
+                animation.value,
+                1,
+              ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              stops: [0, animation.value, 1]),
-        ),
-        child: Text(
-          isCustomer ? 'Become a VENDOR' : 'Become a CUSTOMER',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
+            ),
+          ),
+          padding: EdgeInsets.symmetric(
+            vertical: 16,
+            horizontal: 32,
+          ),
+          child: Text(
+            isCustomer ? 'Become a VENDOR' : 'Back to CUSTOMER',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ),

@@ -9,10 +9,7 @@ class DrawerItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(title),
-      trailing: Icon(
-        icon,
-        color: Colors.black,
-      ),
+      trailing: Icon(icon, color: Colors.black),
       onTap: onPressed,
     );
   }

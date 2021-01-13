@@ -8,15 +8,9 @@ class SplashScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'MyShop',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 30,
-              ),
-            ),
+            Text('Welcome to MyShop'),
             SizedBox(
-              height: 20,
+              height: 10,
             ),
             CircularProgressIndicator(),
           ],

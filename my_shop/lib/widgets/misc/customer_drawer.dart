@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:my_shop/screens/home_screen.dart';
 import 'package:my_shop/widgets/misc/drawer_item.dart';
 import 'package:my_shop/widgets/misc/switch_button.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -13,9 +12,7 @@ class CustomerDrawer extends StatelessWidget {
         DrawerItem(
           'Explore',
           Icons.explore,
-          () {
-            Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
-          },
+          () {},
         ),
         DrawerItem(
           'Wish List',
@@ -65,10 +62,7 @@ class CustomerDrawer extends StatelessWidget {
           ],
         ),
         Divider(),
-        SizedBox(
-          height: 10,
-        ),
-        SwitchButton()
+        SwitchButton(),
       ],
     );
   }

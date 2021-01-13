@@ -1,48 +1,39 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
-import 'package:my_shop/screens/collecting_data_screen.dart';
-import 'package:provider/provider.dart';
 import 'package:my_shop/providers/user_provider.dart';
 import 'package:my_shop/screens/transit_screen.dart';
-
-import 'auth_title.dart';
+import 'package:my_shop/widgets/auth_widgets/auth_title.dart';
+import 'package:provider/provider.dart';
 
 class AuthForm extends StatefulWidget {
-  final Function resetPassword;
-  AuthForm(this.resetPassword);
+  final Function toggleResetPassword;
+  AuthForm(this.toggleResetPassword);
   @override
   _AuthFormState createState() => _AuthFormState();
 }
 
 class _AuthFormState extends State<AuthForm> {
-  bool loginMode;
-  double height;
-  GlobalKey fieldKey;
-  GlobalKey<FormState> form;
-  String email, password, confirmPassword;
-  bool hidePassword, hideConfirmPassword, loading;
+  String email, password;
+  bool hidePassword, hideConfirmPassword, loginMode;
   FocusNode passwordNode, confirmPasswordNode;
+  double height;
+  GlobalKey field;
+  GlobalKey<FormState> form;
+  bool loading;
+
   @override
   void initState() {
     super.initState();
-    hidePassword = hideConfirmPassword = true;
-    fieldKey = GlobalKey();
-    form = GlobalKey<FormState>();
-    loginMode = true;
-    height = 0;
+    loading = false;
     passwordNode = FocusNode();
     confirmPasswordNode = FocusNode();
-    loading = false;
+    hideConfirmPassword = hidePassword = loginMode = true;
+    height = 0;
+    field = GlobalKey();
+    form = GlobalKey<FormState>();
   }
 
-  void showError(String error) {
-    Scaffold.of(context).showSnackBar(SnackBar(
-      content: Text(error),
-      backgroundColor: Colors.redAccent,
-    ));
-  }
-
-  void validateToLogin() async {
+  void tryToLogin() async {
     if (form.currentState.validate()) {
       setState(() {
         loading = true;
@@ -50,32 +41,38 @@ class _AuthFormState extends State<AuthForm> {
       String error = await Provider.of<UserProvider>(context, listen: false)
           .login(email, password);
       if (error == null) {
+        //home screen
         Navigator.of(context).pushReplacementNamed(TransitScreen.routeName);
       } else {
         setState(() {
           loading = false;
         });
-        showError(error);
+        Scaffold.of(context).showSnackBar(SnackBar(
+          content: Text(error),
+          backgroundColor: Colors.red[900],
+        ));
       }
     }
   }
 
-  void validateToRegister() async {
+  void tryToRegister() async {
     if (form.currentState.validate()) {
       setState(() {
         loading = true;
       });
-
       String error = await Provider.of<UserProvider>(context, listen: false)
           .register(email, password);
-
       if (error == null) {
+        //home screen
         Navigator.of(context).pushReplacementNamed(TransitScreen.routeName);
       } else {
         setState(() {
           loading = false;
         });
-        showError(error);
+        Scaffold.of(context).showSnackBar(SnackBar(
+          content: Text(error),
+          backgroundColor: Colors.red[900],
+        ));
       }
     }
   }
@@ -83,68 +80,53 @@ class _AuthFormState extends State<AuthForm> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height,
       width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
       child: Center(
         child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 30).add(
-            EdgeInsets.only(
-              top: MediaQuery.of(context).size.height * 0.05,
-            ),
-          ),
+          padding: EdgeInsets.fromLTRB(30, 30, 30, 5),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               AnimatedSwitcher(
                 duration: Duration(milliseconds: 400),
                 child: (loginMode)
-                    ? AuthTitle(UniqueKey(), 'Log into')
+                    ? AuthTitle(UniqueKey(), 'Login into')
                     : AuthTitle(UniqueKey(), 'Create'),
+              ),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.05,
               ),
               Form(
                 key: form,
                 child: Column(
                   children: [
                     TextFormField(
-                      key: fieldKey,
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
+                      key: field,
+                      style: TextStyle(color: Colors.white),
                       keyboardType: TextInputType.emailAddress,
-                      textInputAction: TextInputAction.next,
                       onFieldSubmitted: (value) {
                         passwordNode.requestFocus();
                       },
+                      textInputAction: TextInputAction.next,
                       validator: (value) {
                         setState(() {
                           email = value;
                         });
-
-                        if (EmailValidator.validate(email)) {
+                        if (EmailValidator.validate(value)) {
                           return null;
                         }
-
-                        return 'Invalid email address';
+                        return 'Invalid email';
                       },
                       decoration: InputDecoration(
-                        hintText: 'example@abc.com',
-                        labelText: 'Email',
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.white,
-                            width: 3,
-                          ),
-                        ),
+                        errorStyle: TextStyle(color: Colors.redAccent),
                         errorBorder: UnderlineInputBorder(
                           borderSide: BorderSide(
                             color: Colors.redAccent,
                           ),
                         ),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.white,
-                          ),
-                        ),
+                        hintText: 'example@abc.com',
+                        labelText: 'Email',
                         labelStyle: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -152,16 +134,21 @@ class _AuthFormState extends State<AuthForm> {
                         hintStyle: TextStyle(
                           color: Colors.white,
                         ),
-                        errorStyle: TextStyle(
-                          color: Colors.redAccent,
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white, width: 1),
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.white,
+                            width: 2,
+                          ),
                         ),
                       ),
                     ),
                     TextFormField(
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
+                      style: TextStyle(color: Colors.white),
                       obscureText: hidePassword,
+                      focusNode: passwordNode,
                       textInputAction: (loginMode)
                           ? TextInputAction.done
                           : TextInputAction.next,
@@ -177,13 +164,34 @@ class _AuthFormState extends State<AuthForm> {
                         if (value.length >= 6) {
                           return null;
                         }
-                        return 'Password must contains 6 characters at least';
+                        return 'Password must contain 6 characters at least';
                       },
-                      focusNode: passwordNode,
                       decoration: InputDecoration(
+                        errorBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.redAccent,
+                          ),
+                        ),
+                        errorStyle: TextStyle(color: Colors.redAccent),
                         hintText: '••••••••',
                         labelText: 'Password',
-                        suffix: InkWell(
+                        labelStyle: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        hintStyle: TextStyle(
+                          color: Colors.white,
+                        ),
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white, width: 1),
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.white,
+                            width: 2,
+                          ),
+                        ),
+                        suffix: GestureDetector(
                           onTap: () {
                             setState(() {
                               hidePassword = !hidePassword;
@@ -196,90 +204,34 @@ class _AuthFormState extends State<AuthForm> {
                             color: Colors.white,
                           ),
                         ),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.white,
-                            width: 3,
-                          ),
-                        ),
-                        errorBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.redAccent,
-                          ),
-                        ),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.white,
-                          ),
-                        ),
-                        labelStyle: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                        hintStyle: TextStyle(
-                          color: Colors.white,
-                        ),
-                        errorStyle: TextStyle(
-                          color: Colors.redAccent,
-                        ),
                       ),
                     ),
                     AnimatedContainer(
                       duration: Duration(seconds: 1),
-                      curve: Curves.bounceOut,
                       height: height,
+                      curve: Curves.bounceOut,
                       child: AnimatedOpacity(
                         duration: Duration(milliseconds: 400),
                         opacity: loginMode ? 0 : 1,
                         child: TextFormField(
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
+                          style: TextStyle(color: Colors.white),
                           obscureText: hideConfirmPassword,
-                          validator: (value) {
-                            setState(() {
-                              confirmPassword = value;
-                            });
-
-                            if (loginMode || value == password) {
+                          focusNode: confirmPasswordNode,
+                          validator: (confirmPassword) {
+                            if (loginMode || password == confirmPassword) {
                               return null;
                             }
-
-                            return 'Passwords don\'t match';
+                            return 'Passwords must match';
                           },
-                          focusNode: confirmPasswordNode,
                           decoration: InputDecoration(
-                            hintText: '••••••••',
-                            labelText: 'Confirm Password',
-                            suffix: InkWell(
-                              onTap: () {
-                                setState(() {
-                                  hideConfirmPassword = !hideConfirmPassword;
-                                });
-                              },
-                              child: Icon(
-                                (hideConfirmPassword)
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
-                                color: Colors.white,
-                              ),
-                            ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.white,
-                                width: 3,
-                              ),
-                            ),
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.white,
-                              ),
-                            ),
                             errorBorder: UnderlineInputBorder(
                               borderSide: BorderSide(
                                 color: Colors.redAccent,
                               ),
                             ),
+                            errorStyle: TextStyle(color: Colors.redAccent),
+                            hintText: '••••••••',
+                            labelText: 'Confirm Password',
                             labelStyle: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -287,8 +239,31 @@ class _AuthFormState extends State<AuthForm> {
                             hintStyle: TextStyle(
                               color: Colors.white,
                             ),
-                            errorStyle: TextStyle(
-                              color: Colors.redAccent,
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: Colors.white, width: 1),
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.white,
+                                width: 2,
+                              ),
+                            ),
+                            suffix: GestureDetector(
+                              onLongPressStart: (_) {
+                                setState(() {
+                                  hideConfirmPassword = !hideConfirmPassword;
+                                });
+                              },
+                              onLongPressEnd: (details) {
+                                setState(() {
+                                  hideConfirmPassword = !hideConfirmPassword;
+                                });
+                              },
+                              child: Icon(
+                                Icons.visibility,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
@@ -302,24 +277,26 @@ class _AuthFormState extends State<AuthForm> {
                 child: FlatButton(
                   padding: EdgeInsets.zero,
                   child: Text(
-                    'Forget Password?',
+                    'Reset Password',
                     style: TextStyle(
                       color: Colors.white,
                     ),
                   ),
                   onPressed: () {
-                    widget.resetPassword();
+                    widget.toggleResetPassword();
                   },
                 ),
               ),
-              Container(
-                width: double.infinity,
-                height: 50,
-                child: (loading)
-                    ? Center(child: CircularProgressIndicator())
-                    : RaisedButton(
+              (loading)
+                  ? Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : Container(
+                      width: double.infinity,
+                      height: 50,
+                      child: RaisedButton(
                         shape: StadiumBorder(),
-                        color: Theme.of(context).accentColor,
+                        color: Colors.black,
                         child: AnimatedSwitcher(
                           duration: Duration(milliseconds: 400),
                           child: (loginMode)
@@ -327,94 +304,90 @@ class _AuthFormState extends State<AuthForm> {
                                   'Login',
                                   key: UniqueKey(),
                                   style: TextStyle(
-                                    fontWeight: FontWeight.bold,
                                     fontSize: 20,
-                                    color: Theme.of(context).primaryColor,
+                                    color: Colors.white,
                                   ),
                                 )
                               : Text(
                                   'Register',
                                   key: UniqueKey(),
                                   style: TextStyle(
-                                    fontWeight: FontWeight.bold,
                                     fontSize: 20,
-                                    color: Theme.of(context).primaryColor,
+                                    color: Colors.white,
                                   ),
                                 ),
                         ),
                         onPressed: () {
                           if (loginMode) {
-                            validateToLogin();
+                            tryToLogin();
                           } else {
-                            validateToRegister();
+                            tryToRegister();
                           }
                         },
                       ),
-              ),
+                    ),
               AnimatedSwitcher(
                 duration: Duration(milliseconds: 400),
                 child: (loginMode)
-                    ? Row(
+                    ? FlatButton(
                         key: UniqueKey(),
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Don\'t have an account?',
-                            style: TextStyle(
-                              color: Colors.white,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Don\'t have an account?',
+                              style: TextStyle(color: Colors.white),
                             ),
-                          ),
-                          FlatButton(
-                            padding: EdgeInsets.zero,
-                            child: Text(
-                              'Sign Up',
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Text(
+                              'Register!',
                               style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                decoration: TextDecoration.underline,
-                              ),
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.underline),
                             ),
-                            onPressed: () {
-                              final ctx = fieldKey.currentContext;
-                              final box = ctx.findRenderObject() as RenderBox;
-                              setState(() {
-                                loginMode = !loginMode;
-                                height = box.size.height;
-                              });
-                            },
-                          ),
-                        ],
+                          ],
+                        ),
+                        onPressed: () {
+                          final ctx = field.currentContext;
+                          final box = ctx.findRenderObject() as RenderBox;
+                          setState(() {
+                            height = box.size.height + 20;
+                            loginMode = !loginMode;
+                          });
+                        },
                       )
-                    : Row(
+                    : FlatButton(
                         key: UniqueKey(),
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Already have an account?',
-                            style: TextStyle(
-                              color: Colors.white,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Already have an account?',
+                              style: TextStyle(color: Colors.white),
                             ),
-                          ),
-                          FlatButton(
-                            padding: EdgeInsets.zero,
-                            child: Text(
-                              'Sign In',
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Text(
+                              'Login!',
                               style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                decoration: TextDecoration.underline,
-                              ),
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.underline),
                             ),
-                            onPressed: () {
-                              setState(() {
-                                loginMode = !loginMode;
-                                height = 0;
-                              });
-                            },
-                          ),
-                        ],
+                          ],
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            height = 0;
+                            loginMode = !loginMode;
+                          });
+                        },
                       ),
-              )
+              ),
             ],
           ),
         ),
